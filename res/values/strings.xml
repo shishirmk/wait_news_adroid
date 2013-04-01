@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WaitNews</string>
+    <string name="action_settings">Settings</string>
+    <string name="wait_time_search">Search</string>
+    <string name="search_box_placeholder">Enter Location.</string>
+</resources>
