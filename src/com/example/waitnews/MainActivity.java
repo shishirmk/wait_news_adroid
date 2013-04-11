@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,6 +25,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	@Override
@@ -35,14 +38,17 @@ public class MainActivity extends Activity {
 		searchButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	final Toast toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG);
         		Thread thread = new Thread(new Runnable(){
         		    @Override
         		    public void run() {
         		        try {
         		        	String searchString = (String) ((EditText)findViewById(R.id.search_box)).getText().toString();
         	            	try {
-        	            		JSONArray results = new JSONArray(readWaitNewsFeed());
-        	            		displaySearchResults(results);
+        	            		JSONArray results = new JSONArray(readWaitNewsFeed(searchString));
+        	            		String names = displaySearchResults(results);
+        	            		toast.setText(names);
+        	            		toast.show();
         	            	} catch (JSONException e) {
         	            		e.printStackTrace();
         	            	}
@@ -56,22 +62,34 @@ public class MainActivity extends Activity {
 		});
 	}
 	
-	protected void displaySearchResults(JSONArray jsonArray) {
+	protected String displaySearchResults(JSONArray jsonArray) {
+		String names = new String();
 		for (int i = 0; i < jsonArray.length(); i++) {
 	        JSONObject jsonObject;
 			try {
 				jsonObject = jsonArray.getJSONObject(i);
-				Log.d(MainActivity.class.getName(), jsonObject.toString());
+				names += jsonObject.optString("name") + " ";
+				Log.d(MainActivity.class.getName(), jsonObject.optString("name"));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 	    }
+		return names;
 	}
 	
-	public String readWaitNewsFeed() {
+	public String readWaitNewsFeed(String query) {
 		StringBuilder builder = new StringBuilder();
 		HttpClient client = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet("http://10.0.0.19:3000/addresses.json");
+		String hostname = "10.0.0.40";
+		String port = "3000";
+		String url = new String();
+		try {
+			url = "http://" + hostname + ":" + port + "/places/search?query=" + URLEncoder.encode(query, "UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		HttpGet httpGet = new HttpGet(url);
 		try {
 			HttpResponse response = client.execute(httpGet);
 			StatusLine statusLine = response.getStatusLine();
