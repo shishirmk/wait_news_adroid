@@ -4,10 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -24,11 +22,15 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class WaitNewsService extends Service {
-
+	private static final int REQUEST_QUEUE_CAPACITY = 1000;
+    private long requestID = 0;
+    private LinkedBlockingQueue<Request> requestQueue = 
+    			new LinkedBlockingQueue<Request>(REQUEST_QUEUE_CAPACITY);
+	
 	public interface WaitNewsServiceInt {
 		/* Callback interface to be implemented by WaitNewsService 
 		 * clients to process the results retrieved. */
-		public void processSearchResults(long requestID, String res);
+		public void processSearchResults(long requestID, String results);
 	}
 
 	public class WaitNewsServiceBinder extends Binder {
@@ -38,32 +40,24 @@ public class WaitNewsService extends Service {
 	}
 	
     private final IBinder mBinder = new WaitNewsServiceBinder();
-    private long requestID = 0;
-    private long lastRequestServed = 0;
-    private Semaphore mutex = new Semaphore(1, true);
-    private ArrayList<WaitNewsServiceInt> requests = new ArrayList<WaitNewsServiceInt>();
-    private ArrayList<String> requestUrls = new ArrayList<String>();
+    Thread serviceThread = null;
     
     @Override
     public void onCreate() {
-    	// TODO
-    	Thread serviceThread = new Thread(new Runnable(){
+    	serviceThread = new Thread(new Runnable(){
 		    @Override
 		    public void run() {
 		    	while (true) {
 		    		try {
-						mutex.acquire();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						continue;
-					}
-		    		if (lastRequestServed < requests.size()) {
-		    			String query = requestUrls.get((int)lastRequestServed);
-		    			requests.get((int)lastRequestServed).processSearchResults(lastRequestServed,
-		    																	  WaitNewsService.readWaitNewsFeed(query));
-		    			lastRequestServed++;
+		    			Request rq = requestQueue.take();
+		    			rq.getCallBack()
+		    			  .processSearchResults(
+		    				   rq.getRequestID(), 
+		    				   readWaitNewsFeed(rq.getQueryString())
+		    			   );
+		    		} catch (Exception e) {
+		    			// Do nothing
 		    		}
-		    		mutex.release();
 		    	}
 		    }
 		});
@@ -72,7 +66,7 @@ public class WaitNewsService extends Service {
 
     @Override
     public void onDestroy() {
-    	// TODO
+    	// Nothing needed as of now.
     }
 
     @Override
@@ -88,8 +82,7 @@ public class WaitNewsService extends Service {
 		String url = new String();
 		try {
 			url = "http://" + hostname + ":" + port + "/places/search?query=" + URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		HttpGet httpGet = new HttpGet(url);
@@ -117,18 +110,14 @@ public class WaitNewsService extends Service {
 		return builder.toString();
 	}
     
-    public long getSearchResults(String url, WaitNewsServiceInt callBackObj) {
+    public long getSearchResults(String query, WaitNewsServiceInt callBackObj) {
     	Log.d("main activity: ", callBackObj.toString());
 		try {
-			mutex.acquire();
+			requestQueue.put(new Request(query, requestID++, callBackObj));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			return -1;
 		}
-		requests.add(callBackObj);
-		requestUrls.add(url);
-		requestID++;
-		mutex.release();
     	return requestID;
     }
 }

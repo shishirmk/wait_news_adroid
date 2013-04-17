@@ -1,7 +1,5 @@
 package com.example.waitnews;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -22,6 +20,26 @@ import com.example.waitnews.WaitNewsService.WaitNewsServiceInt;
 public class MainActivity extends Activity implements WaitNewsServiceInt {
 	private WaitNewsService mService;
 	private boolean mBound = false;
+	
+	private static final int MAX_OUTSTANDING_RESPONSES = 1000;
+    private LinkedBlockingQueue<String> responses = 
+    			new LinkedBlockingQueue<String>(MAX_OUTSTANDING_RESPONSES);
+    
+    
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, 
+        							   IBinder service) {
+            WaitNewsServiceBinder binder = (WaitNewsServiceBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,12 +50,15 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
 		searchButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick(View v) {
-	        	String searchString = (String) ((EditText)findViewById(R.id.search_box)).getText().toString();
+	        	String searchString = 
+	        			(String) ((EditText)findViewById(R.id.search_box))
+	        						.getText().toString();
 	        	if (mBound) {
 	        		mService.getSearchResults(searchString, MainActivity.this);
 	        	}
             }
 		});
+		displayResults();
 	}
 	
     @Override
@@ -55,24 +76,22 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
             mBound = false;
         }
     }
-    
-    private ServiceConnection mConnection = new ServiceConnection() {
-    	
-        @Override
-        public void onServiceConnected(ComponentName className, 
-        							   IBinder service) {
-            WaitNewsServiceBinder binder = (WaitNewsServiceBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-    
     public void processSearchResults(long requestID, String res) {
-    	Log.d("Results: ", res);
+    	try {
+    		responses.put(res);
+    	} catch (Exception e) {
+    		// Do nothing
+    	}
+    }
+    
+    private void displayResults() {
+    	while (true) {
+    		try {
+    			Log.d("Results: ", responses.take());
+    		} catch (Exception e) {
+    			// Do nothing
+    		}
+    	}
     }
 }
