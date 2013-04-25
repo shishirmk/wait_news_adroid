@@ -87,10 +87,11 @@ public class WaitNewsService extends Service {
 		}
 		HttpGet httpGet = new HttpGet(url);
 		try {
+			Log.d("Fetching: ", url);
 			HttpResponse response = client.execute(httpGet);
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
-			Log.d(MainActivity.class.toString(), statusLine.toString());
+			Log.d(WaitNewsService.class.toString(), statusLine.toString());
 			if (statusCode == 200) {
 				HttpEntity entity = response.getEntity();
 				InputStream content = entity.getContent();

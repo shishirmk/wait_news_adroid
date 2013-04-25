@@ -1,5 +1,7 @@
 package com.example.waitnews;
-import java.util.concurrent.LinkedBlockingQueue;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -7,25 +9,34 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import com.example.waitnews.WaitNewsService.WaitNewsServiceBinder;
 import com.example.waitnews.WaitNewsService.WaitNewsServiceInt;
 
 public class MainActivity extends Activity implements WaitNewsServiceInt {
-	private WaitNewsService mService;
+	private WaitNewsService mService; 
 	private boolean mBound = false;
+	private ResultListAdapter resultAdapter = null;
+	private ListView resultList = null;
 	
-	private static final int MAX_OUTSTANDING_RESPONSES = 1000;
-    private LinkedBlockingQueue<String> responses = 
-    			new LinkedBlockingQueue<String>(MAX_OUTSTANDING_RESPONSES);
-    
-    
+	private Handler resultHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+        	if (msg.what == 0) {
+        		displayResults((String) msg.obj);
+        	}
+        }
+	};
+	
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, 
@@ -46,6 +57,16 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+	  ResultRow results[] = new ResultRow[] {
+		  new ResultRow("Sunnyvale", "Cloudy"),
+	  };
+			        
+		resultAdapter = new ResultListAdapter(this, R.layout.result_list_row, 
+				  							  results);
+		resultAdapter.setNotifyOnChange(true);
+		resultList = (ListView) findViewById(R.id.results_list);
+		resultList.setAdapter(resultAdapter);
+		
 		Button searchButton = (Button) findViewById(R.id.search_button);	
 		searchButton.setOnClickListener( new OnClickListener() {
             @Override
@@ -54,11 +75,11 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
 	        			(String) ((EditText)findViewById(R.id.search_box))
 	        						.getText().toString();
 	        	if (mBound) {
-	        		mService.getSearchResults(searchString, MainActivity.this);
+	        		long ID = mService.getSearchResults(searchString, MainActivity.this);
+	        		Log.d("Rid: ", "ID" + ID);
 	        	}
             }
 		});
-		displayResults();
 	}
 	
     @Override
@@ -79,19 +100,29 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
 
     public void processSearchResults(long requestID, String res) {
     	try {
-    		responses.put(res);
+    		resultHandler.sendMessage(resultHandler.obtainMessage(0, res));
     	} catch (Exception e) {
     		// Do nothing
     	}
     }
     
-    private void displayResults() {
-    	while (true) {
-    		try {
-    			Log.d("Results: ", responses.take());
-    		} catch (Exception e) {
-    			// Do nothing
-    		}
-    	}
+    private void displayResults(String results_string) {
+    	JSONArray results_json_array;
+    	Log.d("display", results_string);
+		try {
+			results_json_array = new JSONArray(results_string);
+			// resultAdapter.clear();
+	    	for (int i = 0; i < results_json_array.length(); i++) {
+				JSONObject result = results_json_array.getJSONObject(i);
+				String name = result.getString("name");
+				Log.d("J: ", name);
+				resultAdapter.add(new ResultRow("hello", name));
+	    	}
+			// resultAdapter.notifyDataSetChanged();
+			// Toast.makeText(getApplicationContext(), results_string, Toast.LENGTH_LONG).show();
+			Log.d("Results: ", results_string);
+		} catch (Exception e) {
+			Log.d("Exception", e.toString());
+		}
     }
 }

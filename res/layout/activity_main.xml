@@ -1,20 +1,35 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="match_parent"
     tools:context=".MainActivity" >
-    <EditText
-     	android:id="@+id/search_box"
-        android:layout_width="0dp"
+
+    <Button
+        android:id="@+id/search_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/wait_time_search" />
+
+    <EditText
+        android:id="@+id/search_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/search_button"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/search_button"
+        android:ems="10"
         android:hint="@string/search_box_placeholder"
-        android:maxLines="1">
+        android:maxLines="1" >
         <requestFocus />
     </EditText>
-    <Button
-     	android:id="@+id/search_button"
-     	android:layout_width="wrap_content"
-     	android:layout_height="wrap_content"
-     android:text="@string/wait_time_search" />
- </LinearLayout>
+
+    <ListView
+        android:id="@+id/results_list"
+        android:layout_below="@id/search_box"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </ListView>
+
+ </RelativeLayout>
