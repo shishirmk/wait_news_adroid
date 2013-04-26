@@ -1,4 +1,4 @@
-package com.example.waitnews;
+package com.waitnews;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

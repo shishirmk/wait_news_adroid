@@ -1,5 +1,5 @@
-package com.example.waitnews;
-import com.example.waitnews.WaitNewsService.WaitNewsServiceInt;
+package com.waitnews;
+import com.waitnews.WaitNewsService.WaitNewsServiceInt;
 public class Request {
 	private String query;
 	private long requestID;

@@ -1,6 +1,8 @@
-package com.example.waitnews;
+package com.waitnews;
 
 import java.util.ArrayList;
+
+import com.waitnews.R;
 
 import android.app.Activity;
 import android.content.Context;

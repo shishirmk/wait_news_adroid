@@ -1,4 +1,4 @@
-package com.example.waitnews;
+package com.waitnews;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -19,8 +19,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.example.waitnews.WaitNewsService.WaitNewsServiceBinder;
-import com.example.waitnews.WaitNewsService.WaitNewsServiceInt;
+import com.waitnews.R;
+import com.waitnews.WaitNewsService.WaitNewsServiceBinder;
+import com.waitnews.WaitNewsService.WaitNewsServiceInt;
 
 public class MainActivity extends Activity implements WaitNewsServiceInt {
 
