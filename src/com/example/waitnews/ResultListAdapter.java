@@ -14,16 +14,19 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
 
     Context context; 
     int layoutResourceId;    
-    ArrayList<ResultRow> data = null;
+    ArrayList<ResultRow> data = new ArrayList<ResultRow>();
     
-    public ResultListAdapter(Context context, int layoutResourceId, ResultRow[] data) {
+    public ResultListAdapter(Context context, int layoutResourceId, ArrayList<ResultRow> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
-        this.data = new ArrayList<ResultRow>();
-        for (int i = 0; i < data.length; i++) {
-        	this.data.add(data[i]);
-        }
+        this.data = data;
+    }
+    
+    public ResultListAdapter(Context context, int layoutResourceId) {
+        super(context, layoutResourceId);
+        this.layoutResourceId = layoutResourceId;
+        this.context = context;
     }
 
     @Override
@@ -44,15 +47,29 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
             holder = (ResultHolder)row.getTag();
         }
         
-        ResultRow result = data.get(position);
-        holder.place.setText(result.place);
-        holder.address.setText(result.address);
+        ResultRow result = null;
+		try {
+			result = data.get(position);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        if (result != null) {
+        	holder.place.setText(result.place);
+        	holder.address.setText(result.address);
+        }
         
         return row;
     }
     
     public void add(ResultRow obj) {
-    	data.add(obj);
+    	this.data.add(obj);
+    	this.notifyDataSetChanged();
+    }
+    
+    public void clear(){
+    	this.data.clear();
+    	this.notifyDataSetChanged();
     }
     
     static class ResultHolder {

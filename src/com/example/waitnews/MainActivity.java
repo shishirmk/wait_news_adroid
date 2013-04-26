@@ -1,5 +1,7 @@
 package com.example.waitnews;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -57,13 +59,10 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-	  ResultRow results[] = new ResultRow[] {
-		  new ResultRow("Sunnyvale", "Cloudy"),
-	  };
+	    ArrayList<ResultRow> results = new ArrayList<ResultRow>();
 			        
 		resultAdapter = new ResultListAdapter(this, R.layout.result_list_row, 
 				  							  results);
-		resultAdapter.setNotifyOnChange(true);
 		resultList = (ListView) findViewById(R.id.results_list);
 		resultList.setAdapter(resultAdapter);
 		
@@ -111,14 +110,24 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
     	Log.d("display", results_string);
 		try {
 			results_json_array = new JSONArray(results_string);
-			// resultAdapter.clear();
+			resultAdapter.clear();
 	    	for (int i = 0; i < results_json_array.length(); i++) {
 				JSONObject result = results_json_array.getJSONObject(i);
 				String name = result.getString("name");
+				JSONObject address = result.getJSONObject("address");
+				String address_string = new String();
+				if ( address.getString("line1") != "null" ){ 
+					address_string += address.getString("line1") + " ";
+				}
+				if ( address.getString("line2") != "null" ){
+					address_string += address.getString("line2") + " ";
+				}
+				if ( address.getString("city") != "null" ){
+					address_string += address.getString("city");
+				}
 				Log.d("J: ", name);
-				resultAdapter.add(new ResultRow("hello", name));
+				resultAdapter.add(new ResultRow(name, address_string));
 	    	}
-			// resultAdapter.notifyDataSetChanged();
 			// Toast.makeText(getApplicationContext(), results_string, Toast.LENGTH_LONG).show();
 			Log.d("Results: ", results_string);
 		} catch (Exception e) {
