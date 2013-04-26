@@ -1,9 +1,7 @@
 package com.example.waitnews;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -25,16 +23,22 @@ import com.example.waitnews.WaitNewsService.WaitNewsServiceBinder;
 import com.example.waitnews.WaitNewsService.WaitNewsServiceInt;
 
 public class MainActivity extends Activity implements WaitNewsServiceInt {
-	private WaitNewsService mService; 
-	private boolean mBound = false;
-	private ResultListAdapter resultAdapter = null;
-	private ListView resultList = null;
-	
-	private Handler resultHandler = new Handler(){
+
+	private static class MainActivityHandler extends Handler {
+		private final WeakReference<MainActivity> mActivity;
+		
+	    public MainActivityHandler(MainActivity activity) {
+	        mActivity = new WeakReference<MainActivity>(activity);
+	    }
+	    
         @Override
         public void handleMessage(Message msg) {
+        	MainActivity activity = mActivity.get();
+        	if (activity == null) {
+        		return;
+        	}
         	if (msg.what == 0) {
-        		displayResults((String) msg.obj);
+        		activity.displayResults((String) msg.obj);
         	}
         }
 	};
@@ -53,16 +57,22 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
             mBound = false;
         }
     };
+    
+	private WaitNewsService mService; 
+	private boolean mBound = false;
+	private ResultListAdapter resultAdapter = null;
+	private ListView resultList = null;
+	private MainActivityHandler mHandler = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		mHandler = new MainActivityHandler(this);
 		
-	    ArrayList<ResultRow> results = new ArrayList<ResultRow>();
-			        
 		resultAdapter = new ResultListAdapter(this, R.layout.result_list_row, 
-				  							  results);
+											  new ArrayList<ResultRow>());
 		resultList = (ListView) findViewById(R.id.results_list);
 		resultList.setAdapter(resultAdapter);
 		
@@ -99,36 +109,19 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
 
     public void processSearchResults(long requestID, String res) {
     	try {
-    		resultHandler.sendMessage(resultHandler.obtainMessage(0, res));
+    		mHandler.sendMessage(mHandler.obtainMessage(0, res));
     	} catch (Exception e) {
-    		// Do nothing
+    		Log.d(MainActivity.class.toString(), e.toString());
     	}
     }
     
     private void displayResults(String results_string) {
-    	JSONArray results_json_array;
-    	Log.d("display", results_string);
 		try {
-			results_json_array = new JSONArray(results_string);
+			SearchResults results = new SearchResults(results_string);
 			resultAdapter.clear();
-	    	for (int i = 0; i < results_json_array.length(); i++) {
-				JSONObject result = results_json_array.getJSONObject(i);
-				String name = result.getString("name");
-				JSONObject address = result.getJSONObject("address");
-				String address_string = new String();
-				if ( address.getString("line1") != "null" ){ 
-					address_string += address.getString("line1") + " ";
-				}
-				if ( address.getString("line2") != "null" ){
-					address_string += address.getString("line2") + " ";
-				}
-				if ( address.getString("city") != "null" ){
-					address_string += address.getString("city");
-				}
-				Log.d("J: ", name);
-				resultAdapter.add(new ResultRow(name, address_string));
-	    	}
-			// Toast.makeText(getApplicationContext(), results_string, Toast.LENGTH_LONG).show();
+			for (int i = 0; i < results.size(); i++) {
+				resultAdapter.add(results.getResult(i));
+			}
 			Log.d("Results: ", results_string);
 		} catch (Exception e) {
 			Log.d("Exception", e.toString());

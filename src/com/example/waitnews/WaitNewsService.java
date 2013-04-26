@@ -38,6 +38,25 @@ public class WaitNewsService extends Service {
 	    }
 	}
 	
+//	private static class WaitNewsServiceHandler extends Handler {
+//		private final WeakReference<WaitNewsService> mService;
+//		
+//	    public WaitNewsServiceHandler(WaitNewsService service) {
+//	        mService = new WeakReference<WaitNewsService>(service);
+//	    }
+//	    
+//        @Override
+//        public void handleMessage(Message msg) {
+//        	WaitNewsService service = mService.get();
+//        	if (service == null) {
+//        		return;
+//        	}
+//        	if (msg.what == 0) {
+//        		service.getSearchResults();
+//        	}
+//        }
+//	}
+	
     private final IBinder mBinder = new WaitNewsServiceBinder();
     Thread serviceThread = null;
     
@@ -111,7 +130,7 @@ public class WaitNewsService extends Service {
 	}
     
     public long getSearchResults(String query, WaitNewsServiceInt callBackObj) {
-    	Log.d("main activity: ", callBackObj.toString());
+    	Log.d(WaitNewsService.class.toString(), callBackObj.toString());
 		try {
 			requestQueue.put(new Request(query, requestID++, callBackObj));
 		} catch (InterruptedException e) {

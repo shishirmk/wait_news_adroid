@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,17 +23,12 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
         this.context = context;
         this.data = data;
     }
-    
-    public ResultListAdapter(Context context, int layoutResourceId) {
-        super(context, layoutResourceId);
-        this.layoutResourceId = layoutResourceId;
-        this.context = context;
-    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         ResultHolder holder = null;
+        ResultRow result = null;
         
         if(row == null) {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
@@ -47,12 +43,10 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
             holder = (ResultHolder)row.getTag();
         }
         
-        ResultRow result = null;
 		try {
 			result = data.get(position);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.d(ResultListAdapter.class.toString(), e.toString());
 		}
         if (result != null) {
         	holder.place.setText(result.place);
