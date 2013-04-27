@@ -6,7 +6,7 @@ public class ResultRow {
     public ResultRow() {
         super();
     }
-    
+
     public ResultRow(String place, String address) {
         super();
         this.place = place;

@@ -25,29 +25,29 @@ import com.waitnews.WaitNewsService.WaitNewsServiceInt;
 
 public class MainActivity extends Activity implements WaitNewsServiceInt {
 
-	private static class MainActivityHandler extends Handler {
-		private final WeakReference<MainActivity> mActivity;
-		
-	    public MainActivityHandler(MainActivity activity) {
-	        mActivity = new WeakReference<MainActivity>(activity);
-	    }
-	    
+    private static class MainActivityHandler extends Handler {
+        private final WeakReference<MainActivity> mActivity;
+
+        public MainActivityHandler(MainActivity activity) {
+            mActivity = new WeakReference<MainActivity>(activity);
+        }
+
         @Override
         public void handleMessage(Message msg) {
-        	MainActivity activity = mActivity.get();
-        	if (activity == null) {
-        		return;
-        	}
-        	if (msg.what == 0) {
-        		activity.displayResults((String) msg.obj);
-        	}
+            MainActivity activity = mActivity.get();
+            if (activity == null) {
+                return;
+            }
+            if (msg.what == 0) {
+                activity.displayResults((String) msg.obj);
+            }
         }
-	};
-	
+    };
+
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, 
-        							   IBinder service) {
+                                       IBinder service) {
             WaitNewsServiceBinder binder = (WaitNewsServiceBinder) service;
             mService = binder.getService();
             mBound = true;
@@ -58,40 +58,40 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
             mBound = false;
         }
     };
-    
-	private WaitNewsService mService; 
-	private boolean mBound = false;
-	private ResultListAdapter resultAdapter = null;
-	private ListView resultList = null;
-	private MainActivityHandler mHandler = null;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+    private WaitNewsService mService; 
+    private boolean mBound = false;
+    private ResultListAdapter mResultAdapter = null;
+    private ListView mResultList = null;
+    private MainActivityHandler mHandler = null;
 
-		mHandler = new MainActivityHandler(this);
-		
-		resultAdapter = new ResultListAdapter(this, R.layout.result_list_row, 
-											  new ArrayList<ResultRow>());
-		resultList = (ListView) findViewById(R.id.results_list);
-		resultList.setAdapter(resultAdapter);
-		
-		Button searchButton = (Button) findViewById(R.id.search_button);	
-		searchButton.setOnClickListener( new OnClickListener() {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mHandler = new MainActivityHandler(this);
+
+        mResultAdapter = new ResultListAdapter(this, R.layout.result_list_row, 
+                                               new ArrayList<ResultRow>());
+        mResultList = (ListView) findViewById(R.id.results_list);
+        mResultList.setAdapter(mResultAdapter);
+
+        Button searchButton = (Button) findViewById(R.id.search_button);	
+        searchButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick(View v) {
-	        	String searchString = 
-	        			(String) ((EditText)findViewById(R.id.search_box))
-	        						.getText().toString();
-	        	if (mBound) {
-	        		long ID = mService.getSearchResults(searchString, MainActivity.this);
-	        		Log.d("Rid: ", "ID" + ID);
-	        	}
+                String searchString = 
+                        (String) ((EditText)findViewById(R.id.search_box))
+                        .getText().toString();
+                if (mBound) {
+                    long ID = mService.getSearchResults(searchString, MainActivity.this);
+                    Log.d("Rid: ", "ID" + ID);
+                }
             }
-		});
-	}
-	
+        });
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -109,23 +109,23 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
     }
 
     public void processSearchResults(long requestID, String res) {
-    	try {
-    		mHandler.sendMessage(mHandler.obtainMessage(0, res));
-    	} catch (Exception e) {
-    		Log.d(MainActivity.class.toString(), e.toString());
-    	}
+        try {
+            mHandler.sendMessage(mHandler.obtainMessage(0, res));
+        } catch (Exception e) {
+            Log.d(MainActivity.class.toString(), e.toString());
+        }
     }
-    
+
     private void displayResults(String results_string) {
-		try {
-			SearchResults results = new SearchResults(results_string);
-			resultAdapter.clear();
-			for (int i = 0; i < results.size(); i++) {
-				resultAdapter.add(results.getResult(i));
-			}
-			Log.d("Results: ", results_string);
-		} catch (Exception e) {
-			Log.d("Exception", e.toString());
-		}
+        try {
+            SearchResults results = new SearchResults(results_string);
+            mResultAdapter.clear();
+            for (int i = 0; i < results.size(); i++) {
+                mResultAdapter.add(results.getResult(i));
+            }
+            Log.d("Results: ", results_string);
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        }
     }
 }
