@@ -85,7 +85,7 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
                         (String) ((EditText)findViewById(R.id.search_box))
                         .getText().toString();
                 if (mBound) {
-                    long ID = mService.getSearchResults(searchString, MainActivity.this);
+                    long ID = mService.sendRequest(searchString, MainActivity.this);
                     Log.d("Rid: ", "ID" + ID);
                 }
             }
@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
         }
     }
 
-    public void processSearchResults(long requestID, String res) {
+    public void handleResponse(long requestId, String res) {
         try {
             mHandler.sendMessage(mHandler.obtainMessage(0, res));
         } catch (Exception e) {
