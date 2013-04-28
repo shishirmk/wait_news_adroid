@@ -9,24 +9,7 @@ import android.util.Log;
 
 final class SearchResultParser {
     public static ResultRow parseJSONResult(JSONObject resObj) {
-        ResultRow result = null;
-        try {
-            String name = resObj.getString("name");
-            JSONObject addrObj = resObj.getJSONObject("address");
-            String address = new String();
-            if ( addrObj.getString("line1") != "null" ) { 
-                address += addrObj.getString("line1") + " ";
-            } 
-            if ( addrObj.getString("line2") != "null" ){
-                address += addrObj.getString("line2") + " ";
-            }
-            if ( addrObj.getString("city") != "null" ){
-                address += addrObj.getString("city");
-            }
-            result = new ResultRow(name, address);
-        } catch (Exception e) {
-            Log.d(SearchResultParser.class.toString(), e.toString());
-        }
+        ResultRow result = new ResultRow(resObj);
         return result;
     }
 }

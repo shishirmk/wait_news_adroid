@@ -2,8 +2,6 @@ package com.waitnews;
 
 import java.util.ArrayList;
 
-import com.waitnews.R;
-
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -11,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 public class ResultListAdapter extends ArrayAdapter<ResultRow>{
 
@@ -36,9 +33,7 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
 
-            holder = new ResultHolder();
-            holder.place = (TextView)row.findViewById(R.id.item_place);
-            holder.address = (TextView)row.findViewById(R.id.item_address);
+            holder = new ResultHolder(row);
 
             row.setTag(holder);
         } else {
@@ -51,8 +46,7 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
             Log.d(ResultListAdapter.class.toString(), e.toString());
         }
         if (result != null) {
-            holder.place.setText(result.place);
-            holder.address.setText(result.address);
+            holder.populate(result);
         }
 
         return row;
@@ -66,10 +60,5 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
     public void clear(){
         this.data.clear();
         this.notifyDataSetChanged();
-    }
-
-    static class ResultHolder {
-        TextView place;
-        TextView address;
     }
 }
