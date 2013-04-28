@@ -91,7 +91,7 @@ public class WaitNewsService extends Service {
                             RestQuery(queueItem.request.getRequestUrl())
                         );
                     } catch (Exception e) {
-                        // Do nothing
+                        Log.d(WaitNewsService.class.toString(), "REST Query failed!");
                     }
                 }
             }
