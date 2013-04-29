@@ -102,7 +102,7 @@ public class WaitNewsService extends Service {
 
     @Override
     public void onDestroy() {
-        // Nothing needed as of now.
+        // TODO: Look up if any actions necessary on destroy.
     }
 
     @Override
