@@ -1,6 +1,5 @@
 package com.waitnews;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -89,7 +88,7 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
                         long ID = mService.sendRequest(new WaitNewsSearchRequest(query), 
                                                        MainActivity.this);
                         Log.d("Rid: ", "ID" + ID);
-                    } catch (UnsupportedEncodingException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

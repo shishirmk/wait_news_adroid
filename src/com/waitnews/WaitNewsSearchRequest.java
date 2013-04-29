@@ -1,21 +1,36 @@
 package com.waitnews;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 /**
  * Represents the wait news request to the endpoint /places/search?query=
  * See WaitNews API for more details.
  */
 public class WaitNewsSearchRequest extends WaitNewsServiceRequest {
-    String query; /* Search term */
-    private static final String API_ENDPOINT = "/places/search?query=";
+    private static final String API_ENDPOINT = "/places/search";
     
-    public WaitNewsSearchRequest(String query) throws UnsupportedEncodingException {
-        this.query = URLEncoder.encode(query, "UTF-8");
+    private String query; /* Search term */
+    private List<NameValuePair> params; /* Params associated with the request */
+    
+    public WaitNewsSearchRequest(String query) {
+        this.query = query;
+        params = new ArrayList<NameValuePair>();
     }
     
     public String getRequestUrl() {
-        return API_ENDPOINT + query;
+        return API_ENDPOINT;
+    }
+    
+    public List<NameValuePair> getParams() {
+        params.add(new BasicNameValuePair("query", query));
+        return params;
+    }
+    
+    public WaitNewsRequestType getRequestType() {
+        return WaitNewsRequestType.GET;
     }
 }

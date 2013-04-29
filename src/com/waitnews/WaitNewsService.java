@@ -1,18 +1,5 @@
 package com.waitnews;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Service;
 import android.content.Intent;
@@ -22,7 +9,6 @@ import android.util.Log;
 
 public class WaitNewsService extends Service {
     private static final int REQUEST_QUEUE_CAPACITY = 1000;
-    private static final String WAIT_NEWS_HOSTPORT = "10.0.0.40:3000";
     
     private long requestId = 0;
     private LinkedBlockingQueue<WaitNewsServiceRequestQueueItem> requestQueue = 
@@ -83,12 +69,13 @@ public class WaitNewsService extends Service {
         mServiceThread = new Thread(new Runnable(){
             @Override
             public void run() {
+                WaitNewsRestClient client = new WaitNewsRestClient();
                 while (true) {
                     try {
                         WaitNewsServiceRequestQueueItem queueItem = requestQueue.take();
                         queueItem.requestCallBack.handleResponse(
                             queueItem.requestId,
-                            RestQuery(queueItem.request.getRequestUrl())
+                            client.execute(queueItem.request)
                         );
                     } catch (Exception e) {
                     	// Don't handle this currently.. Just log!
@@ -108,36 +95,6 @@ public class WaitNewsService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
-    }
-
-    public static String RestQuery(String apiEndPoint) {
-        StringBuilder builder = new StringBuilder();
-        HttpClient client = new DefaultHttpClient();
-        String url = "http://" + WAIT_NEWS_HOSTPORT + apiEndPoint;
-        HttpGet httpGet = new HttpGet(url);
-        try {
-            Log.d("Fetching: ", url);
-            HttpResponse response = client.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            Log.d(WaitNewsService.class.toString(), statusLine.toString());
-            if (statusCode == 200) {
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-            } else {
-                Log.d(MainActivity.class.toString(), "Failed to download file");
-            }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return builder.toString();
     }
 
     public long sendRequest(WaitNewsServiceRequest request, 
