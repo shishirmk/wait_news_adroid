@@ -140,17 +140,14 @@ public class WaitNewsService extends Service {
         return builder.toString();
     }
 
-    public long sendRequest(String query, WaitNewsServiceInt callBackObj) {
+    public long sendRequest(WaitNewsServiceRequest request, 
+                            WaitNewsServiceInt callBackObj) {
         Log.d(WaitNewsService.class.toString(), callBackObj.toString());
         try {
-            WaitNewsServiceRequest request = new WaitNewsSearchRequest(query);
             requestQueue.put(new WaitNewsServiceRequestQueueItem(requestId++,
                                                                  request,
                                                                  callBackObj));
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            return -1;
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return -1;
         }

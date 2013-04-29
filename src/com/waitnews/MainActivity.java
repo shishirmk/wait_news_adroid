@@ -1,5 +1,6 @@
 package com.waitnews;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -19,7 +20,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.waitnews.R;
 import com.waitnews.WaitNewsService.WaitNewsServiceBinder;
 import com.waitnews.WaitNewsService.WaitNewsServiceInt;
 
@@ -81,12 +81,17 @@ public class MainActivity extends Activity implements WaitNewsServiceInt {
         searchButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String searchString = 
+                String query = 
                         (String) ((EditText)findViewById(R.id.search_box))
                         .getText().toString();
                 if (mBound) {
-                    long ID = mService.sendRequest(searchString, MainActivity.this);
-                    Log.d("Rid: ", "ID" + ID);
+                    try {
+                        long ID = mService.sendRequest(new WaitNewsSearchRequest(query), 
+                                                       MainActivity.this);
+                        Log.d("Rid: ", "ID" + ID);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
