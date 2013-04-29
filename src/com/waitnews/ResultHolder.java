@@ -19,8 +19,8 @@ public class ResultHolder {
     
     public void populate(ResultRow result){
         this.place.setText(result.placeName);
-        this.address_line1.setText(result.line1);
-        this.address_line2.setText(result.city + ", " + result.state);
+        this.address_line1.setText(result.address.line1);
+        this.address_line2.setText(result.address.city + ", " + result.address.state);
     }
 
 }
