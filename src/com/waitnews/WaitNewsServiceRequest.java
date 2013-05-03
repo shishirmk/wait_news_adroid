@@ -1,6 +1,5 @@
 package com.waitnews;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.NameValuePair;

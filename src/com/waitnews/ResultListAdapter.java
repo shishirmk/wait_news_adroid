@@ -32,9 +32,7 @@ public class ResultListAdapter extends ArrayAdapter<ResultRow>{
         if(row == null) {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
-
             holder = new ResultHolder(row);
-
             row.setTag(holder);
         } else {
             holder = (ResultHolder)row.getTag();

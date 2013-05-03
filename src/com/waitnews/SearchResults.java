@@ -18,7 +18,8 @@ public class SearchResults {
     ArrayList<ResultRow> results = new ArrayList<ResultRow>();
     public SearchResults(String jsonString) {
         try {
-            JSONArray jsonResults = new JSONArray(jsonString);
+            JSONObject places = new JSONObject(jsonString);
+            JSONArray jsonResults = places.getJSONArray("places");
             for (int i = 0; i < jsonResults.length(); i++) {
                 results.add(
                             SearchResultParser.parseJSONResult(

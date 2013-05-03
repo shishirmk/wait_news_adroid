@@ -1,33 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical"
+    android:listSelector="@drawable/list_selector">
     
+    <LinearLayout
+        android:id="@+id/place_info"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dp"
+     	android:focusable="false"
+        android:padding="3dp" >
+           
     <TextView android:id="@+id/item_place"
-       android:textIsSelectable="true"
+       android:textIsSelectable="false"
        android:layout_width="fill_parent"
        android:layout_height="fill_parent"
-       android:gravity="center_vertical"
+       android:gravity="left"
        android:textStyle="bold"
        android:textSize="18sp"
        android:textColor="#222222"
+       android:focusable="false"
        android:layout_marginTop="2dp"
        android:layout_marginBottom="2dp" />
     
     <TextView android:id="@+id/item_address_line1"
-       android:textIsSelectable="true" 
+       android:textIsSelectable="false" 
        android:layout_width="fill_parent"
        android:layout_height="fill_parent"
-       android:gravity="center_vertical"
+       android:gravity="left"
+       android:focusable="false"
        android:textSize="15sp"
-       android:textColor="#999999" />
+       android:textColor="#999999"/>
     
     <TextView android:id="@+id/item_address_line2"
-       android:textIsSelectable="true" 
+       android:textIsSelectable="false" 
        android:layout_width="fill_parent"
        android:layout_height="fill_parent"
-       android:gravity="center_vertical"
+       android:gravity="left"
+       android:focusable="false"
        android:textSize="15sp"
-       android:textColor="#999999"  />
-</LinearLayout>
+       android:textColor="#999999"/>
+    </LinearLayout>
+ 
+    <TextView
+        android:id="@+id/avg_wait_time"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:textColor="#bf0000"
+        android:textIsSelectable="false"
+        android:textSize="30sp"
+        android:padding="10dp"
+        android:focusable="false"/>
+    
+</RelativeLayout>

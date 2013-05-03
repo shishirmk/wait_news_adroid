@@ -8,7 +8,7 @@ import android.util.Log;
 public class ResultRow {
     public String placeName;
     public Address address;
-    public Float avgWaitTime;
+    public Integer avgWaitTime;
     public WaitTime lastestWait;
     public ResultRow() {
         super();
@@ -20,7 +20,7 @@ public class ResultRow {
             this.placeName = resObj.getString("name");
             JSONObject addrObj = resObj.getJSONObject("address");
             this.address = new Address(addrObj);
-            this.avgWaitTime = Float.parseFloat(resObj.getString("average_wait_time"));
+            this.avgWaitTime = (int) Math.floor(Double.parseDouble(resObj.getString("average_wait_time")));
         } catch (JSONException e) {
             Log.d("Exception:", ResultRow.class.toString());
             e.printStackTrace();

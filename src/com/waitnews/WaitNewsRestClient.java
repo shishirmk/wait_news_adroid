@@ -24,8 +24,8 @@ import android.util.Log;
  * WaitNewsRestClient allows one to send requests to the WaitNews server over HTTP.
  */
 public class WaitNewsRestClient {
-    private static final String WAIT_NEWS_HOST = "10.0.0.40";
-    private static final int WAIT_NEWS_PORT = 3000;
+    private static final String WAIT_NEWS_HOST = "www.waitnews.com";
+    private static final int WAIT_NEWS_PORT = 80;
     private static final HttpHost WAIT_NEWS_SERVER = new HttpHost(WAIT_NEWS_HOST, WAIT_NEWS_PORT);
 
     private HttpClient mClient; /* HTTP client used to send request */
