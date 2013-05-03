@@ -92,7 +92,7 @@ public class MainActivity extends SherlockActivity implements WaitNewsServiceInt
         super.onCreate(savedInstanceState);
         
         if (Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-            this.setTheme(com.actionbarsherlock.R.style.Theme_Sherlock_Light);
+            this.setTheme(R.style.Theme_Sherlock_Light);
         }
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Waitnews");
